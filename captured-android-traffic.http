@@ -1,0 +1,564 @@
+POST https://cognito-idp.us-east-1.amazonaws.com/
+Accept-Encoding: identity
+amz-sdk-invocation-id: d91ab3bd-8595-495f-b5a7-fa57e5d4e907
+amz-sdk-request: attempt=1; max=3
+Connection: Keep-Alive
+Content-Length: 2311
+Content-Type: application/x-amz-json-1.1
+Host: cognito-idp.us-east-1.amazonaws.com
+User-Agent: aws-sdk-kotlin/1.2.8 ua/2.0 api/cognito-identity-provider#1.2.8 os/android#6.6.30-android15-7-gbb616d66d8a9-ab11968886-4k lang/kotlin#1.9.23 md/javaVersion#0 md/jvmName#Dalvik md/jvmVersion#2.1.0 md/androidApiVersion#35 md/androidRelease#15 lib/amplify-android#2.19.1 md/Google#sdk_gphone64_arm64 md/locale#en_US
+X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth
+x-amz-user-agent: aws-sdk-kotlin/1.2.8
+
+{
+  "AuthFlow": "USER_SRP_AUTH",
+  "AuthParameters": {
+    "USERNAME": "{{username}}",
+    "SRP_A": "aa0ed000dcc88ee58a21e2dd66dcf3d0f0d091db8753181689c8381f45195bbe65af8eee455a0eb6703cb4f27166203aae900aeffc9fe65e216beaef42d9b88847e0dbaf5b1571d0563d7667950670f85c58f2e70b43ac8e9cf73e1fe6d49e8ceaba9e60bdde3639aaad937526c7ba31cff00277a9225cae85569e637b4cfb3f4bdfeb5405fce34c38e1d876745112cf27d1947eabbd2bc888e8cc4315ba0e26b0e3ec266eee621cf83130709356866632f311d0f0a246b640b89812869623a65b64b0048b4a68967e0056085ce14612b6e8b4120b8b5d667ce4baaad27fc2678a10439c7f7c490b1d9cd249659dfc615b73994a6983aec9c7ab57861ef91b0a3a428f0f3a0c0c673d1ef74be6c89d6cce23418718878cc3f0d5b57264b2c8e70f244c83fb41db06ce11b16f3ecb51a1286a0ef9b0f190c42b75e6f364f679c40ad581709ce9f4f878ecaf26aaca2229b17ed23e99a9ed5a61be7f155fa4333a4d32bbe5216c6a15f63a7e0ad23c2757aab668e12dc3b76e5118a176ecd5ed4",
+    "SECRET_HASH": "1dfbVi/Pc4wlPkgsj+CuROcTCGydh01LZvHpG7C4CyU="
+  },
+  "ClientId": "3ab216b01fdhikjm572upes83r",
+  "ClientMetadata": {},
+  "UserContextData": {
+    "EncodedData": "..."
+  }
+}
+
+> response
+
+# 200 OK
+# Connection: keep-alive
+# Content-Length: 2731
+# Content-Type: application/x-amz-json-1.1
+# Date: Sun, 26 Jan 2025 14:47:56 GMT
+# x-amzn-RequestId: dad2ee56-1e85-4925-8cdb-e5491bd0b5d3
+#
+# {
+#   "ChallengeName": "PASSWORD_VERIFIER",
+#   "ChallengeParameters": {
+#     "SALT": "25a6588bbeae0052d50b72baa68786ed",
+#     "SECRET_BLOCK": "iZpEBLlAMxwNdG5uIfPdS2/TjP6W6lJ4dP92X04/23+AOn2HorXZq7LswW9kLFrMIiFNE8/5xJqnn7JWJONYCl/HsOFi6iS/ulVxv/VS/+MC3PGxq/oEqd3FRX+M9Ds+iBpEV64JEzMWysP4ixE28CNhnzg9V/2SzU5ixYAaYfEZjRvxX7uNvWbyRWKe1cnmc3FaMy0nfWKA6m3VELitzT6hpijZ+6uPAC0noxFEM5wQiQbNfgbEeHqabxH1LEcHvsTPAHIdYGrpR7SleJY07AChnmATkyxJQC6QkCZqRYDY13i1I5VzVfDLCGfMBQTv63O0KUtT5gXGjH4R7GL30lJZR8UohbgmwowhJGR0b0+h805hnq2yC6/4Nosw9uJHn3LEH2kdZK9c5qD0AucAqz1vxTO/mJnqFaquq6fFwGBc1p1OQXed9LZva46cwK9PZd5PhQnbmaCADwN5uZV0C91SVCP2RAX24kqCctb3SIq+TI2Bu4fSsm494ab5GiPx7tSsw0v7b65cIS8UfQ7C5Dd6czTWLTthV0IN9iR0FTyc27NVxLP8HUC2ajx6f5RC1n7oivcvapJsWm+2aalQg2xT3jTKxle8gpMw9Qbt15v0mSGnGuZFc/1WvAsvMn6EIDR7dzj1ayWeLocteACMmkQghBGrNtS+0DT721LYL1kWyBvUtFeZ2ael467RhIWCSZJT5iWwh4OO/95GrL9MaXmsmnkDSCACc820ibNdk7w0bgxRgG2bH5iKJBaNrcqkdk5dyioLgir7MvLVGpmUl3TwfPFjYSnsQzbldVDjHSiqkQvF0Xht6wDSMvSF96vGw65gw1QuA+c9db8Y/zfFkQDspb/RZarqVbB3z00p6gaYsDq8Wp1MR8PdEUlSTx2y9tyTvlglFWWthSlKqK45WmSvjEc7IrRQ43c4d1wHtC8LS+qVxkzM/hk4I+dvruR0v5SWcZQIFJUWq05u7MrnkF836f6mVWeva2IMOLAKq1C2rWcv4qek/Fd2wWv7421X3MsvJM7S0Ig1EbLWCAhb0/nOFOS7IFpwHbqznL2rEnZAHcshIV2Ok8cFkAv8sbtyV1OOwciN1CdVZL//iN68v1wqLKGwj0ph4uHvQeGxIz8gCTUwr3sHUTJrzsHe0dC3ODCgPuGw8E3VTgXGIvZkuFKYbL10gkZVujdGngHR2gTXDLdvWDYquuE1QWVAp3YxW/mLJlKESRJhC7NLYSq5XjpVGwJkJzfgpoxr6Aidd/eE9D+9mZBrJYMdxWUtxpJOkX2IDv7LFQa/u+Ee8V3js83jV8V5MDf8KpVsL3h5kGrb6IUcfbXHwJA6R1YqqYFAHLd8g7RvpMqRH6H/Y3TNgc3MTe+NZsE/+/jg/8pSFoutG5hTlF/TMJWem/7429jNFhwkhsXaZ1jJJHuJn3Y2Gvm5SND54nc0HYxYExuhMM9XIxEm9JNUcZuluo+yVqPSUNUYDrtClLB+kXY6Nufro8FdnQIp+uqKRJAiMLGFjMLGRDo7DQ2CgZLGdwqwQzehlCMsrOelzA8T0munZgzTWJU378pDILH0oedKmdztmtSb0UmVImOqm0yEQ9lAsUjJZTD7BsO4/o0Blo2U42tCUKniJFLUskX3xqcmDGus4iIAshmbNTS5jDF48T1MYlYqzZe7hpiUdHme7aip2aEa0Tgs4lqWwAPVwz/PrHFHPWZfQhFFD50dPW0QJg==",
+#     "SRP_B": "c1a0e5a8c5b514af618a6535b02a4a025bc02ad674c0f0fab095e150845dc096f441dc295dd9ab3d3a48a89a64ee1be38543ec0990c29dcf159b09979e28204338a42f3021f8880cf2d78ab0cbb1735624923201018eb059c40b1a5eeaa24dc4fdf88245ff208ad87cf3b07e7f6e6970c4c2b3437405632dc2b309400acb46340c47ef23c48231199c68160a78e90e467b406b79f026b47984f761004d1bb8fd3911886ca7e599ec5dbce232a51b40b529e540067f8eb6cb083e610c8e83c61407d52eefec75d825db50813736c61624d8e85bab04320ecbafe8a6f2a8121bcbb8daf9b2a46f7dfeee5cbc67997538323b1a9b948501674aea1b6280413a42bf6649e5c4d7c61f016b94cf898be2949a8ccc953d32af1ad6172ddd01baa930a8185c8bd363c435f57d5fe9ac7b902e60052483fb93d6687be9032bcc98565ee3ee014b87b212b02c473bc8126ef30e56a34b0a7d366af5b5e5e81337507030bbf2287ef9631bdfe3d66896e1c9f455e8a55e94623b2657f5c84472a5470cd134",
+#     "USERNAME": "7bd15e92-0393-4d81-a66a-0c28fd0376ca",
+#     "USER_ID_FOR_SRP": "7bd15e92-0393-4d81-a66a-0c28fd0376ca"
+#   }
+# }
+
+###
+
+POST https://cognito-idp.us-east-1.amazonaws.com/
+Accept-Encoding: identity
+amz-sdk-invocation-id: 10eedcfd-0c99-41e8-b714-91e01568ad46
+amz-sdk-request: attempt=1; max=3
+Connection: Keep-Alive
+Content-Length: 3444
+Content-Type: application/x-amz-json-1.1
+Host: cognito-idp.us-east-1.amazonaws.com
+User-Agent: aws-sdk-kotlin/1.2.8 ua/2.0 api/cognito-identity-provider#1.2.8 os/android#6.6.30-android15-7-gbb616d66d8a9-ab11968886-4k lang/kotlin#1.9.23 md/javaVersion#0 md/jvmName#Dalvik md/jvmVersion#2.1.0 md/androidApiVersion#35 md/androidRelease#15 lib/amplify-android#2.19.1 md/Google#sdk_gphone64_arm64 md/locale#en_US
+X-Amz-Target: AWSCognitoIdentityProviderService.RespondToAuthChallenge
+x-amz-user-agent: aws-sdk-kotlin/1.2.8
+
+{
+  "ChallengeName": "PASSWORD_VERIFIER",
+  "ChallengeResponses": {
+    "USERNAME": "7bd15e92-0393-4d81-a66a-0c28fd0376ca",
+    "PASSWORD_CLAIM_SECRET_BLOCK": "iZpEBLlAMxwNdG5uIfPdS2/TjP6W6lJ4dP92X04/23+AOn2HorXZq7LswW9kLFrMIiFNE8/5xJqnn7JWJONYCl/HsOFi6iS/ulVxv/VS/+MC3PGxq/oEqd3FRX+M9Ds+iBpEV64JEzMWysP4ixE28CNhnzg9V/2SzU5ixYAaYfEZjRvxX7uNvWbyRWKe1cnmc3FaMy0nfWKA6m3VELitzT6hpijZ+6uPAC0noxFEM5wQiQbNfgbEeHqabxH1LEcHvsTPAHIdYGrpR7SleJY07AChnmATkyxJQC6QkCZqRYDY13i1I5VzVfDLCGfMBQTv63O0KUtT5gXGjH4R7GL30lJZR8UohbgmwowhJGR0b0+h805hnq2yC6/4Nosw9uJHn3LEH2kdZK9c5qD0AucAqz1vxTO/mJnqFaquq6fFwGBc1p1OQXed9LZva46cwK9PZd5PhQnbmaCADwN5uZV0C91SVCP2RAX24kqCctb3SIq+TI2Bu4fSsm494ab5GiPx7tSsw0v7b65cIS8UfQ7C5Dd6czTWLTthV0IN9iR0FTyc27NVxLP8HUC2ajx6f5RC1n7oivcvapJsWm+2aalQg2xT3jTKxle8gpMw9Qbt15v0mSGnGuZFc/1WvAsvMn6EIDR7dzj1ayWeLocteACMmkQghBGrNtS+0DT721LYL1kWyBvUtFeZ2ael467RhIWCSZJT5iWwh4OO/95GrL9MaXmsmnkDSCACc820ibNdk7w0bgxRgG2bH5iKJBaNrcqkdk5dyioLgir7MvLVGpmUl3TwfPFjYSnsQzbldVDjHSiqkQvF0Xht6wDSMvSF96vGw65gw1QuA+c9db8Y/zfFkQDspb/RZarqVbB3z00p6gaYsDq8Wp1MR8PdEUlSTx2y9tyTvlglFWWthSlKqK45WmSvjEc7IrRQ43c4d1wHtC8LS+qVxkzM/hk4I+dvruR0v5SWcZQIFJUWq05u7MrnkF836f6mVWeva2IMOLAKq1C2rWcv4qek/Fd2wWv7421X3MsvJM7S0Ig1EbLWCAhb0/nOFOS7IFpwHbqznL2rEnZAHcshIV2Ok8cFkAv8sbtyV1OOwciN1CdVZL//iN68v1wqLKGwj0ph4uHvQeGxIz8gCTUwr3sHUTJrzsHe0dC3ODCgPuGw8E3VTgXGIvZkuFKYbL10gkZVujdGngHR2gTXDLdvWDYquuE1QWVAp3YxW/mLJlKESRJhC7NLYSq5XjpVGwJkJzfgpoxr6Aidd/eE9D+9mZBrJYMdxWUtxpJOkX2IDv7LFQa/u+Ee8V3js83jV8V5MDf8KpVsL3h5kGrb6IUcfbXHwJA6R1YqqYFAHLd8g7RvpMqRH6H/Y3TNgc3MTe+NZsE/+/jg/8pSFoutG5hTlF/TMJWem/7429jNFhwkhsXaZ1jJJHuJn3Y2Gvm5SND54nc0HYxYExuhMM9XIxEm9JNUcZuluo+yVqPSUNUYDrtClLB+kXY6Nufro8FdnQIp+uqKRJAiMLGFjMLGRDo7DQ2CgZLGdwqwQzehlCMsrOelzA8T0munZgzTWJU378pDILH0oedKmdztmtSb0UmVImOqm0yEQ9lAsUjJZTD7BsO4/o0Blo2U42tCUKniJFLUskX3xqcmDGus4iIAshmbNTS5jDF48T1MYlYqzZe7hpiUdHme7aip2aEa0Tgs4lqWwAPVwz/PrHFHPWZfQhFFD50dPW0QJg==",
+    "PASSWORD_CLAIM_SIGNATURE": "mCug8N0HWCbBa5LzfgD7vaVyD+UNsfhbzJu3kLCErAg=",
+    "TIMESTAMP": "Sun Jan 26 14:47:56 UTC 2025",
+    "SECRET_HASH": "rlZ76y92nTmmzOsZokcnAVwwTID+9gbWw9WVShsKiv8=",
+    "DEVICE_KEY": ""
+  },
+  "ClientId": "3ab216b01fdhikjm572upes83r",
+  "ClientMetadata": {},
+  "UserContextData": {
+    "EncodedData": "..."
+  }
+}
+
+> response
+
+# 200 OK
+# Connection: keep-alive
+# Content-Length: 4283
+# Content-Type: application/x-amz-json-1.1
+# Date: Sun, 26 Jan 2025 14:47:57 GMT
+# x-amzn-RequestId: 2ba32026-b630-4dcb-91f0-0fe85382cbc1
+#
+# {
+#   "AuthenticationResult": {
+#     "AccessToken": "eyJraWQiOiJcL2x4dG1cL2FpekV6VEUrOFk5Y2tZRFJBVW55aEh0aHRTemFhRTdJOTIxYUE9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiI3YmQxNWU5Mi0wMzkzLTRkODEtYTY2YS0wYzI4ZmQwMzc2Y2EiLCJldmVudF9pZCI6IjJiYTMyMDI2LWI2MzAtNGRjYi05MWYwLTBmZTg1MzgyY2JjMSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3Mzc5MDI4NzcsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xX3lIc2FWbURjeSIsImV4cCI6MTczNzk4OTI3NywiaWF0IjoxNzM3OTAyODc3LCJqdGkiOiI3YWFhYjg2OS0wYTkxLTQyMDUtYjU4My1iYTRkMWQzZGE0MjciLCJjbGllbnRfaWQiOiIzYWIyMTZiMDFmZGhpa2ptNTcydXBlczgzciIsInVzZXJuYW1lIjoiN2JkMTVlOTItMDM5My00ZDgxLWE2NmEtMGMyOGZkMDM3NmNhIn0.Sue2BVSXIQro7gJE3-plPsA2nq1VkN47ifSgPyu21BjIxi7CUtxdUm9Xrj6_HdWoXOF3zCR_N3QSC2a0GHSY_QdPxDMqn2e8VrwH1ljefebxVSxEw6x2vugKtHC0CIN8seccrtavjO6VJ-EurPphZoNB_uz1M3bClW-O6B0NvDuPyEPTj_vMdbA8o4SgFo8iiMmCz8HLzj4lunfxEHdWvrABAacvEwpOta9snYPPQPZve_3J_9PPDcwRnJqpRY80MgJLYbkhUQpW__t8lUFJqnab9cqap7jYCCWp8bWxXtWUbLYFRryxT025bYaE17xgJ2YCpaZ1o5ectmjbazFbVA",
+#     "ExpiresIn": 86400,
+#     "IdToken": "...",
+#     "RefreshToken": "...",
+#     "TokenType": "Bearer"
+#   },
+#   "ChallengeParameters": {}
+# }
+
+###
+
+GET https://b1u009l9yf.execute-api.us-east-1.amazonaws.com/prod-v6/mypropane/7bd15e92-0393-4d81-a66a-0c28fd0376ca/user-data
+Accept-Encoding: gzip
+Authorization: {{id_token}}
+Connection: Keep-Alive
+Host: b1u009l9yf.execute-api.us-east-1.amazonaws.com
+User-Agent: amplify-android:2.19.1 md/Google/sdk_gphone64_arm64 md/locale/en_US
+
+> response
+
+# 200 OK
+# Access-Control-Allow-Headers: Content-Type, Authorization
+# Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+# Access-Control-Allow-Origin: *
+# Connection: keep-alive
+# Content-Length: 984
+# Content-Type: application/json
+# Date: Sun, 26 Jan 2025 14:48:01 GMT
+# x-amz-apigw-id: FACssGaLoAMEAVw=
+# x-amzn-RequestId: 330a4af4-1590-4ff4-9295-1c46252936f5
+# X-Amzn-Trace-Id: Root=1-67964b1d-26b0a9e377d5a52557aeb4c5;Parent=330d9d4d83e24dd9;Sampled=0;Lineage=1:812a415d:0
+#
+# {
+#   "AppSource": "MyPropane",
+#   "AppVersion": "6.6.4",
+#   "BusinessID": "...",
+#   "CreatedDate": "2025-01-26T13:33:31",
+#   "EnableLocationServices": true,
+#   "LastAccessTimestamp": "2025-01-26T07:47:31",
+#   "TermsAcceptance": true,
+#   "TermsAcceptanceTimestamp": "2025-01-26T13:36:42",
+#   "UserCity": "...",
+#   "UserCountry": "...",
+#   "UserDeviceToken": "...",
+#   "UserDeviceType": "...",
+#   "UserEmail": "...",
+#   "UserFirst": "...",
+#   "UserID": "7bd15e92-0393-4d81-a66a-0c28fd0376ca",
+#   "UserLast": "...",
+#   "UserPhone": "...",
+#   "UserPNS": "...",
+#   "UserState": "...",
+#   "UserStreet": "...",
+#   "UserZip": "...",
+#   "UserLicense": "Basic",
+#   "UserLicenseStatus": "Active",
+#   "UserLicenseExpiration": "Never",
+#   "UserNotificationsEmail": true,
+#   "UserNotificationsPush": true
+# }
+
+###
+
+GET https://b1u009l9yf.execute-api.us-east-1.amazonaws.com/prod-v6/mypropane/7bd15e92-0393-4d81-a66a-0c28fd0376ca/user-devices
+Accept-Encoding: gzip
+Authorization: {{id_token}}
+Connection: Keep-Alive
+Host: b1u009l9yf.execute-api.us-east-1.amazonaws.com
+User-Agent: amplify-android:2.19.1 md/Google/sdk_gphone64_arm64 md/locale/en_US
+
+> response
+
+# 200 OK
+# Access-Control-Allow-Headers: Content-Type, Authorization
+# Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+# Access-Control-Allow-Origin: *
+# Connection: keep-alive
+# Content-Length: 1824
+# Content-Type: application/json
+# Date: Sun, 26 Jan 2025 14:48:02 GMT
+# x-amz-apigw-id: FACtXFMFIAMEezw=
+# x-amzn-RequestId: 9c1766d3-7a27-4c28-9613-e4df30508d65
+# X-Amzn-Trace-Id: Root=1-67964b21-1546e2177d1944dd1d82134d;Parent=74a12321d5127f70;Sampled=0;Lineage=1:812a415d:0
+#
+# {
+#  "36e551aa-c215-4c9b-8c70-ba77296878cc": {
+#    "AlertStatus": "No Alert",
+#    "Altitude": 262.9720764160156,
+#    "AppSource": "MyPropane",
+#    "ApplicationType": "Residential",
+#    "BatteryVolts": 3.935824155807495,
+#    "CreatedDate": "2024-01-01T10:44:20.389662",
+#    "DeviceActive": true,
+#    "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#    "DeviceName": "Test",
+#    "DeviceNotificationsEmail": true,
+#    "DeviceNotificationsPush": true,
+#    "DeviceOwner": true,
+#    "DeviceStatus": "Active",
+#    "DeviceTempCelsius": -5,
+#    "DeviceTempFahrenheit": 23,
+#    "DeviceType": "LOGI-3",
+#    "FirstLevelAlert": 50,
+#    "FuelType": "Propane",
+#    "LastPostTimeIso": "2025-01-25 17:00:38.892",
+#    "Latitude": 0,
+#    "Longitude": 0,
+#    "NextPostTimeIso": "2025-01-25 23:00:38.892000",
+#    "PollsPerDay": 4,
+#    "PropertyOwnership": "Own",
+#    "PropertySize": 2400,
+#    "PropertyType": "Residential",
+#    "SecondLevelAlert": 25,
+#    "SignalQualLTE": -114,
+#    "SolarVolts": 1.3844687938690186,
+#    "TankCity": "...",
+#    "TankCountry": "...",
+#    "TankLevel": 65,
+#    "TankInstallation": "Above Ground",
+#    "TankOrientation": "Horizontal",
+#    "TankOwnership": "Lease",
+#    "TankQuantity": 1,
+#    "TankSize": 1000,
+#    "TankSizeUnit": "Gallons",
+#    "TankState": "...",
+#    "TankStreet": "...",
+#    "TankSupplier": "...",
+#    "TankZip": "...",
+#    "UsageTypeDryer": false,
+#    "UsageTypeFireplace": true,
+#    "UsageTypeFurnace": true,
+#    "UsageTypeGasOven": true,
+#    "UsageTypeGasStove": true,
+#    "UsageTypeGenerator": false,
+#    "UsageTypeIndustrial": false,
+#    "UsageTypeOther": false,
+#    "UsageTypePoolHeat": false,
+#    "UsageTypeWaterHeat": true,
+#    "VersionHW": "3.1",
+#    "VersionLTE": "1.16",
+#    "WeatherHumidity": null,
+#    "WeatherTempCelsius": null,
+#    "WeatherTempFahrenheit": null,
+#    "UserDeviceLicense": "Unlimited",
+#    "UserDeviceLicenseExpiration": "Never",
+#    "UserDeviceLicenseStatus": "Active",
+#    "StripeCustomerID": null,
+#    "StripePaymentMethodID": null
+#  }
+#}
+
+###
+
+GET https://b1u009l9yf.execute-api.us-east-1.amazonaws.com/prod-v6/mypropane/7bd15e92-0393-4d81-a66a-0c28fd0376ca/device-telemetry/36e551aa-c215-4c9b-8c70-ba77296878cc?end_time=2025-01-26%2014:48:01&start_time=2024-12-27%2014:48:01&interval=daily&tank_qty=1&tank_size=1000
+Accept-Encoding: gzip
+Authorization: {{id_token}}
+Connection: Keep-Alive
+Host: b1u009l9yf.execute-api.us-east-1.amazonaws.com
+User-Agent: amplify-android:2.19.1 md/Google/sdk_gphone64_arm64 md/locale/en_US
+
+> response
+
+# 200 OK
+# Connection: keep-alive
+# Content-Length: 7239
+# Content-Type: application/json
+# Date: Sun, 26 Jan 2025 14:48:04 GMT
+# x-amz-apigw-id: FACtZFxoIAMEpJQ=
+# x-amzn-RequestId: 76690a9c-80a3-4a27-a5c9-53b2df6c2ac9
+# X-Amzn-Trace-Id: Root=1-67964b22-3eb914c62ff82f0f40be1baa;Parent=73cf4b2f5e54c21b;Sampled=0;Lineage=1:812a415d:0
+#
+# {
+#   "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#   "Data": [
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2024-12-27 00:00:00.000000000",
+#       "BatteryVolts": 3.97,
+#       "SignalQualLTE": -109,
+#       "SolarVolts": 1.67,
+#       "TankLevel": 75,
+#       "TankLevelPercentDiff": null,
+#       "Consumption": null
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2024-12-28 00:00:00.000000000",
+#       "BatteryVolts": 3.98,
+#       "SignalQualLTE": -112.25,
+#       "SolarVolts": 1.62,
+#       "TankLevel": 75,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2024-12-29 00:00:00.000000000",
+#       "BatteryVolts": 3.97,
+#       "SignalQualLTE": -113.5,
+#       "SolarVolts": 1.52,
+#       "TankLevel": 75,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2024-12-30 00:00:00.000000000",
+#       "BatteryVolts": 3.97,
+#       "SignalQualLTE": -115.5,
+#       "SolarVolts": 1.61,
+#       "TankLevel": 75,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2024-12-31 00:00:00.000000000",
+#       "BatteryVolts": 3.97,
+#       "SignalQualLTE": -113,
+#       "SolarVolts": 1.73,
+#       "TankLevel": 75,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-01 00:00:00.000000000",
+#       "BatteryVolts": 3.97,
+#       "SignalQualLTE": -115.25,
+#       "SolarVolts": 1.44,
+#       "TankLevel": 75,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-02 00:00:00.000000000",
+#       "BatteryVolts": 3.96,
+#       "SignalQualLTE": -116.5,
+#       "SolarVolts": 1.38,
+#       "TankLevel": 75,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-03 00:00:00.000000000",
+#       "BatteryVolts": 3.96,
+#       "SignalQualLTE": -111.25,
+#       "SolarVolts": 1.42,
+#       "TankLevel": 74,
+#       "TankLevelPercentDiff": -1,
+#       "Consumption": -10
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-04 00:00:00.000000000",
+#       "BatteryVolts": 3.96,
+#       "SignalQualLTE": -112.5,
+#       "SolarVolts": 1.5,
+#       "TankLevel": 73,
+#       "TankLevelPercentDiff": -1,
+#       "Consumption": -10
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-05 00:00:00.000000000",
+#       "BatteryVolts": 3.96,
+#       "SignalQualLTE": -115.75,
+#       "SolarVolts": 1.46,
+#       "TankLevel": 73,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-06 00:00:00.000000000",
+#       "BatteryVolts": 3.96,
+#       "SignalQualLTE": -112,
+#       "SolarVolts": 1.47,
+#       "TankLevel": 73,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-07 00:00:00.000000000",
+#       "BatteryVolts": 3.96,
+#       "SignalQualLTE": -113,
+#       "SolarVolts": 1.61,
+#       "TankLevel": 72,
+#       "TankLevelPercentDiff": -1,
+#       "Consumption": -10
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-08 00:00:00.000000000",
+#       "BatteryVolts": 3.96,
+#       "SignalQualLTE": -114.25,
+#       "SolarVolts": 1.69,
+#       "TankLevel": 72,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-09 00:00:00.000000000",
+#       "BatteryVolts": 3.95,
+#       "SignalQualLTE": -113.75,
+#       "SolarVolts": 1.7,
+#       "TankLevel": 71,
+#       "TankLevelPercentDiff": -1,
+#       "Consumption": -10
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-10 00:00:00.000000000",
+#       "BatteryVolts": 3.95,
+#       "SignalQualLTE": -114.25,
+#       "SolarVolts": 1.54,
+#       "TankLevel": 71,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-11 00:00:00.000000000",
+#       "BatteryVolts": 3.95,
+#       "SignalQualLTE": -113.5,
+#       "SolarVolts": 1.45,
+#       "TankLevel": 71,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-12 00:00:00.000000000",
+#       "BatteryVolts": 3.95,
+#       "SignalQualLTE": -114.5,
+#       "SolarVolts": 1.32,
+#       "TankLevel": 71,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-13 00:00:00.000000000",
+#       "BatteryVolts": 3.95,
+#       "SignalQualLTE": -116.25,
+#       "SolarVolts": 1.37,
+#       "TankLevel": 70,
+#       "TankLevelPercentDiff": -1,
+#       "Consumption": -10
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-14 00:00:00.000000000",
+#       "BatteryVolts": 3.95,
+#       "SignalQualLTE": -113.5,
+#       "SolarVolts": 1.38,
+#       "TankLevel": 69,
+#       "TankLevelPercentDiff": -1,
+#       "Consumption": -10
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-15 00:00:00.000000000",
+#       "BatteryVolts": 3.94,
+#       "SignalQualLTE": -115.8,
+#       "SolarVolts": 1.29,
+#       "TankLevel": 69,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-16 00:00:00.000000000",
+#       "BatteryVolts": 3.95,
+#       "SignalQualLTE": -114,
+#       "SolarVolts": 1.22,
+#       "TankLevel": 69,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-17 00:00:00.000000000",
+#       "BatteryVolts": 3.95,
+#       "SignalQualLTE": -111,
+#       "SolarVolts": 1.23,
+#       "TankLevel": 69,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-18 00:00:00.000000000",
+#       "BatteryVolts": 3.95,
+#       "SignalQualLTE": -113,
+#       "SolarVolts": 1.38,
+#       "TankLevel": 69,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-19 00:00:00.000000000",
+#       "BatteryVolts": 3.94,
+#       "SignalQualLTE": -109,
+#       "SolarVolts": 1.42,
+#       "TankLevel": 68,
+#       "TankLevelPercentDiff": -1,
+#       "Consumption": -10
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-20 00:00:00.000000000",
+#       "BatteryVolts": 3.94,
+#       "SignalQualLTE": -116,
+#       "SolarVolts": 1.54,
+#       "TankLevel": 67,
+#       "TankLevelPercentDiff": -1,
+#       "Consumption": -10
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-21 00:00:00.000000000",
+#       "BatteryVolts": 3.93,
+#       "SignalQualLTE": -113,
+#       "SolarVolts": 1.6,
+#       "TankLevel": 66,
+#       "TankLevelPercentDiff": -1,
+#       "Consumption": -10
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-22 00:00:00.000000000",
+#       "BatteryVolts": 3.93,
+#       "SignalQualLTE": -113,
+#       "SolarVolts": 1.52,
+#       "TankLevel": 65,
+#       "TankLevelPercentDiff": -1,
+#       "Consumption": -10
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-23 00:00:00.000000000",
+#       "BatteryVolts": 3.94,
+#       "SignalQualLTE": -112,
+#       "SolarVolts": 1.36,
+#       "TankLevel": 65,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-24 00:00:00.000000000",
+#       "BatteryVolts": 3.94,
+#       "SignalQualLTE": -116,
+#       "SolarVolts": 1.35,
+#       "TankLevel": 65,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     },
+#     {
+#       "DeviceID": "36e551aa-c215-4c9b-8c70-ba77296878cc",
+#       "CloudTimeIso": "2025-01-25 00:00:00.000000000",
+#       "BatteryVolts": 3.94,
+#       "SignalQualLTE": -114,
+#       "SolarVolts": 1.38,
+#       "TankLevel": 65,
+#       "TankLevelPercentDiff": 0,
+#       "Consumption": 0
+#     }
+#   ]
+# }
