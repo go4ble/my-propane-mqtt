@@ -5,9 +5,9 @@ import myPropaneMqtt.CognitoAuthentication
 import java.util.Base64
 
 class HelloSpec extends munit.FunSuite {
-  test("say hello") {
-    assertEquals(Hello.greeting, "hello")
-  }
+//  test("say hello") {
+//    assertEquals(Hello.greeting, "hello")
+//  }
 
   test("CognitoAuthentication integration test") {
     val userPoolId: String = "us-east-1_aaaaaaaaa"

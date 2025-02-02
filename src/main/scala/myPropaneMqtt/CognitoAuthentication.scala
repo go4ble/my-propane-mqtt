@@ -2,6 +2,7 @@ package myPropaneMqtt
 
 // adapted from https://github.com/aws-samples/aws-cognito-java-desktop-app
 
+import com.auth0.jwt.JWT
 import myPropaneMqtt.CognitoAuthentication.{DerivedKeyInfo, DerivedKeySize}
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider
 import software.amazon.awssdk.regions.Region
@@ -71,6 +72,22 @@ class CognitoAuthentication(userPoolId: String, clientId: String, clientSecret: 
     require(authenticationResultOpt.isDefined)
 
     authenticationResultOpt.get
+  }
+
+  def refresh(authResult: AuthenticationResultType): AuthenticationResultType = {
+    val idToken = JWT.decode(authResult.idToken())
+    val authTokenIsExpired = idToken.getExpiresAtAsInstant isBefore Instant.now()
+    if (authTokenIsExpired) {
+      val initiateAuthRequest = InitiateAuthRequest
+        .builder()
+        .authFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
+        .authParameters(Map("REFRESH_TOKEN" -> authResult.refreshToken()).asJava)
+        .build()
+      val initiateAuthResponse = cognitoIdpClient.initiateAuth(initiateAuthRequest)
+      Option(initiateAuthResponse.authenticationResult()).get
+    } else {
+      authResult
+    }
   }
 
   private def calculateSecretHash(username: String): Option[String] = {
