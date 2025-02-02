@@ -6,7 +6,7 @@ import com.auth0.jwt.JWT
 import myPropaneMqtt.CognitoAuthentication.{DerivedKeyInfo, DerivedKeySize}
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider
 import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderAsyncClient
 import software.amazon.awssdk.services.cognitoidentityprovider.model._
 
 import java.security.{MessageDigest, SecureRandom}
@@ -16,17 +16,19 @@ import java.util.Base64
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import scala.annotation.tailrec
+import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
+import scala.jdk.FutureConverters._
 
 class CognitoAuthentication(userPoolId: String, clientId: String, clientSecret: Option[String]) {
   private val awsRegion :: userPoolName :: _ = userPoolId.split('_').toList
-  private val cognitoIdpClient = CognitoIdentityProviderClient
+  private val cognitoIdpClient = CognitoIdentityProviderAsyncClient
     .builder()
     .region(Region.of(awsRegion))
     .credentialsProvider(AnonymousCredentialsProvider.create())
     .build()
 
-  def login(username: String, password: String): AuthenticationResultType = {
+  def login(username: String, password: String)(implicit ec: ExecutionContext): Future[AuthenticationResultType] = {
     val initiateAuthRequest = InitiateAuthRequest
       .builder()
       .authFlow(AuthFlowType.USER_SRP_AUTH)
@@ -39,42 +41,41 @@ class CognitoAuthentication(userPoolId: String, clientId: String, clientSecret: 
         ).collect { case (k, Some(v)) => k -> v }.asJava
       )
       .build()
-    val initiateAuthResponse = cognitoIdpClient.initiateAuth(initiateAuthRequest)
-    require(initiateAuthResponse.challengeName() == ChallengeNameType.PASSWORD_VERIFIER)
-
-    val challengeParameters = initiateAuthResponse.challengeParameters().asScala
-    val B = BigInt(challengeParameters("SRP_B"), 16)
-    val salt = BigInt(challengeParameters("SALT"), 16)
-    val userIdForSRP = challengeParameters("USER_ID_FOR_SRP")
-    val secretBlock = challengeParameters("SECRET_BLOCK")
-    val timestamp = Instant.now().atZone(ZoneOffset.UTC).format(CognitoAuthentication.TimestampFormat)
-    val respondToAuthChallengeRequest = RespondToAuthChallengeRequest
-      .builder()
-      .challengeName(ChallengeNameType.PASSWORD_VERIFIER)
-      .clientId(clientId)
-      .session(initiateAuthResponse.session())
-      .challengeResponses(
-        Map(
-          "PASSWORD_CLAIM_SECRET_BLOCK" -> Some(secretBlock),
-          "PASSWORD_CLAIM_SIGNATURE" -> Some(
-            Base64.getEncoder.encodeToString(
-              calculatePasswordClaimSignature(B, salt, userIdForSRP, password, timestamp, secretBlock)
-            )
-          ),
-          "TIMESTAMP" -> Some(timestamp),
-          "USERNAME" -> challengeParameters.get("USERNAME"),
-          "SECRET_HASH" -> challengeParameters.get("USERNAME").flatMap(calculateSecretHash)
-        ).collect { case (k, Some(v)) => k -> v }.asJava
-      )
-      .build()
-    val respondToAuthChallengeResponse = cognitoIdpClient.respondToAuthChallenge(respondToAuthChallengeRequest)
-    val authenticationResultOpt = Option(respondToAuthChallengeResponse.authenticationResult())
-    require(authenticationResultOpt.isDefined)
-
-    authenticationResultOpt.get
+    for {
+      initiateAuthResponse <- cognitoIdpClient.initiateAuth(initiateAuthRequest).asScala
+      _ = require(initiateAuthResponse.challengeName() == ChallengeNameType.PASSWORD_VERIFIER)
+      challengeParameters = initiateAuthResponse.challengeParameters().asScala
+      srpB = BigInt(challengeParameters("SRP_B"), 16)
+      salt = BigInt(challengeParameters("SALT"), 16)
+      userIdForSRP = challengeParameters("USER_ID_FOR_SRP")
+      secretBlock = challengeParameters("SECRET_BLOCK")
+      timestamp = Instant.now().atZone(ZoneOffset.UTC).format(CognitoAuthentication.TimestampFormat)
+      respondToAuthChallengeRequest = RespondToAuthChallengeRequest
+        .builder()
+        .challengeName(ChallengeNameType.PASSWORD_VERIFIER)
+        .clientId(clientId)
+        .session(initiateAuthResponse.session())
+        .challengeResponses(
+          Map(
+            "PASSWORD_CLAIM_SECRET_BLOCK" -> Some(secretBlock),
+            "PASSWORD_CLAIM_SIGNATURE" -> Some(
+              Base64.getEncoder.encodeToString(
+                calculatePasswordClaimSignature(srpB, salt, userIdForSRP, password, timestamp, secretBlock)
+              )
+            ),
+            "TIMESTAMP" -> Some(timestamp),
+            "USERNAME" -> challengeParameters.get("USERNAME"),
+            "SECRET_HASH" -> challengeParameters.get("USERNAME").flatMap(calculateSecretHash)
+          ).collect { case (k, Some(v)) => k -> v }.asJava
+        )
+        .build()
+      respondToAuthChallengeResponse <- cognitoIdpClient.respondToAuthChallenge(respondToAuthChallengeRequest).asScala
+      authenticationResultOpt = Option(respondToAuthChallengeResponse.authenticationResult())
+      _ = require(authenticationResultOpt.isDefined)
+    } yield authenticationResultOpt.get
   }
 
-  def refresh(authResult: AuthenticationResultType): AuthenticationResultType = {
+  def refresh(authResult: AuthenticationResultType)(implicit ec: ExecutionContext): Future[AuthenticationResultType] = {
     val idToken = JWT.decode(authResult.idToken())
     val authTokenIsExpired = idToken.getExpiresAtAsInstant isBefore Instant.now()
     if (authTokenIsExpired) {
@@ -83,10 +84,13 @@ class CognitoAuthentication(userPoolId: String, clientId: String, clientSecret: 
         .authFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
         .authParameters(Map("REFRESH_TOKEN" -> authResult.refreshToken()).asJava)
         .build()
-      val initiateAuthResponse = cognitoIdpClient.initiateAuth(initiateAuthRequest)
-      Option(initiateAuthResponse.authenticationResult()).get
+      cognitoIdpClient.initiateAuth(initiateAuthRequest).asScala.map { initiateAuthResponse =>
+        val authenticationResultOpt = Option(initiateAuthResponse.authenticationResult())
+        require(authenticationResultOpt.isDefined)
+        authenticationResultOpt.get
+      }
     } else {
-      authResult
+      Future.successful(authResult)
     }
   }
 

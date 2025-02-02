@@ -28,6 +28,7 @@ object MyPropaneApiBehavior {
       tankQty: Int,
       tankSize: Int
   ) extends MyPropaneApiMessage
+  private final case class WaitForAuthResult(authResult: AuthenticationResultType) extends MyPropaneApiMessage
   private final case class ForwardResponse[T <: MyPropaneApiResponse](replyTo: ActorRef[T], response: Response[T])
       extends MyPropaneApiMessage
 
@@ -37,14 +38,31 @@ object MyPropaneApiBehavior {
       clientId = Config.myPropaneClientId,
       clientSecret = Some(Config.myPropaneClientSecret)
     )
-    val authResult = cognitoAuthentication.login(username, password)
     Behaviors.setup { context =>
       val sttpBackend = pekkohttp.PekkoHttpBackend.usingActorSystem(context.system.classicSystem)
-      MyPropaneApiBehavior(sttpBackend, cognitoAuthentication, authResult)
+
+      context.pipeToSelf(cognitoAuthentication.login(username, password)(context.executionContext)) { authResult =>
+        WaitForAuthResult(authResult.get)
+      }
+
+      MyPropaneApiBehavior.waitForAuthResult(sttpBackend, cognitoAuthentication)
     }
   }
 
-  private def apply(
+  private def waitForAuthResult(
+      sttpBackend: SttpBackend[Future, PekkoStreams],
+      cognitoAuthentication: CognitoAuthentication,
+      pendingMessages: Seq[MyPropaneApiMessage] = Nil
+  ): Behavior[MyPropaneApiMessage] = Behaviors.receive {
+    case (context, WaitForAuthResult(authResult)) =>
+      pendingMessages.foreach { context.self ! _ }
+      MyPropaneApiBehavior.readyForApiRequests(sttpBackend, cognitoAuthentication, authResult)
+    case (_, other) =>
+      // collect and replay any messages that were sent before initial authentication was complete
+      MyPropaneApiBehavior.waitForAuthResult(sttpBackend, cognitoAuthentication, pendingMessages :+ other)
+  }
+
+  private def readyForApiRequests(
       sttpBackend: SttpBackend[Future, PekkoStreams],
       cognitoAuthentication: CognitoAuthentication,
       authResult: AuthenticationResultType
@@ -55,9 +73,11 @@ object MyPropaneApiBehavior {
     Behaviors.setup { context =>
       Behaviors.receiveMessage {
         case message if authTokenIsExpired =>
-          context.self ! message
-          val refreshedAuthResult = cognitoAuthentication.refresh(authResult)
-          MyPropaneApiBehavior(sttpBackend, cognitoAuthentication, refreshedAuthResult)
+          context.log.info("refreshing auth token")
+          context.pipeToSelf(cognitoAuthentication.refresh(authResult)(context.executionContext)) { authResult =>
+            WaitForAuthResult(authResult.get)
+          }
+          MyPropaneApiBehavior.waitForAuthResult(sttpBackend, cognitoAuthentication, Seq(message))
 
         case GetUserData(replyTo) =>
           val response = basicRequest
@@ -99,6 +119,8 @@ object MyPropaneApiBehavior {
         case ForwardResponse(replyTo, payload) =>
           replyTo ! payload.body
           Behaviors.same
+
+        case other => throw new Exception(s"unexpected message: $other")
       }
     }
   }

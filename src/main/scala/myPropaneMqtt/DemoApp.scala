@@ -36,15 +36,8 @@ object DemoApp extends scala.App {
         "my-propane-api"
       )
 
-      context.ask(myPropaneApi, GetUserData(_)) {
-        case Success(value)     => GotUserData(value)
-        case Failure(exception) => GotError(exception)
-      }
-
-      context.ask(myPropaneApi, GetUserDevices(_)) {
-        case Success(value)     => GotUserDevices(value)
-        case Failure(exception) => GotError(exception)
-      }
+      context.ask(myPropaneApi, GetUserData(_))(userData => GotUserData(userData.get))
+      context.ask(myPropaneApi, GetUserDevices(_))(userDevices => GotUserDevices(userDevices.get))
 
       Behaviors.receiveMessage {
         case GotUserData(userData) =>
@@ -65,10 +58,7 @@ object DemoApp extends scala.App {
               tankQty = myDevice.tank.tankQuantity,
               tankSize = myDevice.tank.tankSize
             )
-          ) {
-            case Success(value)     => GotDeviceTelemetry(value)
-            case Failure(exception) => GotError(exception)
-          }
+          )(deviceTelemetry => GotDeviceTelemetry(deviceTelemetry.get))
           Behaviors.same
 
         case GotDeviceTelemetry(DeviceTelemetry(_, data)) =>

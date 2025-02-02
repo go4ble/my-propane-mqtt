@@ -3,6 +3,7 @@ package example
 import myPropaneMqtt.CognitoAuthentication
 
 import java.util.Base64
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class HelloSpec extends munit.FunSuite {
 //  test("say hello") {
@@ -17,11 +18,11 @@ class HelloSpec extends munit.FunSuite {
     val password = "Pass123"
 
     val cognitoAuthentication = new CognitoAuthentication(userPoolId, clientId, Some(clientSecret))
-    val result = cognitoAuthentication.login(email, password)
-
-    val _ :: payload :: _ = result.idToken().split('.').toList
-    val idTokenPayload = new String(Base64.getDecoder.decode(payload))
-    println(s"idTokenPayload: $idTokenPayload")
-    assert(idTokenPayload.contains(email))
+    cognitoAuthentication.login(email, password).map { result =>
+      val _ :: payload :: _ = result.idToken().split('.').toList
+      val idTokenPayload = new String(Base64.getDecoder.decode(payload))
+      println(s"idTokenPayload: $idTokenPayload")
+      assert(idTokenPayload.contains(email))
+    }
   }
 }
