@@ -1,0 +1,14 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    ports:
+      - "1883:1883"
+
+  hass:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    volumes:
+      - ./hass-config/:/config
+    ports:
+      - "8123:8123"

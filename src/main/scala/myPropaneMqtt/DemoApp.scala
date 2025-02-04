@@ -14,7 +14,6 @@ import org.apache.pekko.util.Timeout
 
 import java.time.LocalDateTime
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
 
 //noinspection ScalaWeakerAccess
 object DemoApp extends scala.App {

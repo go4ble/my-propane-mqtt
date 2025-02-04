@@ -125,7 +125,8 @@ object MyPropaneApiBehavior {
     }
   }
 
-  private val jsonConfiguration = Json.configured(JsonConfiguration(naming = JsonNaming.PascalCase))
+  private val jsonReadsConfiguration = Json.configured(JsonConfiguration(naming = JsonNaming.PascalCase))
+  private val jsonWritesConfiguration = Json.configured(JsonConfiguration(naming = JsonNaming.SnakeCase))
 
   // customize DefaultLocalDateTimeReads to handle missing 'T'
   @unused private implicit val localDateTimeReads: Reads[LocalDateTime] =
@@ -144,6 +145,18 @@ object MyPropaneApiBehavior {
           acc + (prefix, JsObject(groupedByPrefix(Some(prefix))))
         }
       case jsValue => jsValue
+    }
+  }
+
+  private implicit class EnhancedOWrites[T](writes: OWrites[T]) {
+    def flatten: OWrites[T] = writes.transform(flattenJsObject)
+
+    private def flattenJsObject(jsObject: JsObject): JsObject = {
+      JsObject(jsObject.value.flatMap {
+        case (_, nestedJsObject: JsObject) =>
+          flattenJsObject(nestedJsObject).value
+        case x => Seq(x)
+      })
     }
   }
 
@@ -181,15 +194,16 @@ object MyPropaneApiBehavior {
         userNotificationsEmail: Boolean,
         userNotificationsPush: Boolean
     )
-    @unused private implicit val userReads: Reads[User] = jsonConfiguration.reads
+    @unused private implicit val userReads: Reads[User] = jsonReadsConfiguration.reads
 
     private[MyPropaneApiBehavior] implicit val userDataReads: Reads[UserData] =
-      jsonConfiguration.reads[UserData].withNestedPrefixes(Seq("User"))
+      jsonReadsConfiguration.reads[UserData].withNestedPrefixes(Seq("User"))
   }
 
   case class UserDevice(
       alertStatus: String,
       altitude: BigDecimal,
+      appSource: String,
       batteryVolts: BigDecimal,
       createdDate: LocalDateTime,
       device: UserDevice.Device,
@@ -206,7 +220,6 @@ object MyPropaneApiBehavior {
       solarVolts: BigDecimal,
       tank: UserDevice.Tank,
       usageType: UserDevice.UsageType,
-      weather: UserDevice.Weather,
       userDeviceLicense: UserDevice.UserDeviceLicense,
       versionHW: String,
       versionLTE: String
@@ -225,7 +238,8 @@ object MyPropaneApiBehavior {
         deviceTempFahrenheit: BigInt,
         deviceType: String
     )
-    @unused private implicit val deviceReads: Reads[Device] = jsonConfiguration.reads
+    @unused private implicit val deviceReads: Reads[Device] = jsonReadsConfiguration.reads
+    implicit val deviceWrites: OWrites[Device] = jsonWritesConfiguration.writes
 
     case class Tank(
         tankCity: String,
@@ -242,7 +256,8 @@ object MyPropaneApiBehavior {
         tankSupplier: String,
         tankZip: String
     )
-    @unused private implicit val tankReads: Reads[Tank] = jsonConfiguration.reads
+    @unused private implicit val tankReads: Reads[Tank] = jsonReadsConfiguration.reads
+    implicit val tankWrites: OWrites[Tank] = jsonWritesConfiguration.writes
 
     case class UsageType(
         usageTypeDryer: Boolean,
@@ -256,33 +271,37 @@ object MyPropaneApiBehavior {
         usageTypePoolHeat: Boolean,
         usageTypeWaterHeat: Boolean
     )
-    @unused private implicit val usageTypeReads: Reads[UsageType] = jsonConfiguration.reads
+    @unused private implicit val usageTypeReads: Reads[UsageType] = jsonReadsConfiguration.reads
+    implicit val usageTypeWrites: OWrites[UsageType] = jsonWritesConfiguration.writes
 
     case class Property(
         propertyOwnership: String,
         propertySize: Int,
         propertyType: String
     )
-    @unused private implicit val propertyReads: Reads[Property] = jsonConfiguration.reads
+    @unused private implicit val propertyReads: Reads[Property] = jsonReadsConfiguration.reads
+    implicit val propertyWrites: OWrites[Property] = jsonWritesConfiguration.writes
 
-    case class Weather(
-        weatherHumidity: JsValue,
-        weatherTempCelsius: JsValue,
-        weatherTempFahrenheit: JsValue
-    )
-    @unused private implicit val weatherReads: Reads[Weather] = jsonConfiguration.reads
+//    case class Weather(
+//        weatherHumidity: JsValue,
+//        weatherTempCelsius: JsValue,
+//        weatherTempFahrenheit: JsValue
+//    )
+//    @unused private implicit val weatherReads: Reads[Weather] = jsonReadsConfiguration.reads
+//    implicit val weatherWrites: OWrites[Weather] = jsonWritesConfiguration.writes
 
     case class UserDeviceLicense(
         userDeviceLicense: String,
         userDeviceLicenseExpiration: String,
         userDeviceLicenseStatus: String
     )
-    @unused private implicit val userDeviceLicenseReads: Reads[UserDeviceLicense] =
-      jsonConfiguration.reads
+    @unused private implicit val userDeviceLicenseReads: Reads[UserDeviceLicense] = jsonReadsConfiguration.reads
+    implicit val userDeviceLicenseWrites: OWrites[UserDeviceLicense] = jsonWritesConfiguration.writes
 
-    private[MyPropaneApiBehavior] implicit val userDeviceReads: Reads[UserDevice] = jsonConfiguration
+    private[MyPropaneApiBehavior] implicit val userDeviceReads: Reads[UserDevice] = jsonReadsConfiguration
       .reads[UserDevice]
       .withNestedPrefixes(Seq("Device", "Tank", "UsageType", "Property", "Weather", "UserDeviceLicense"))
+    implicit val userDeviceWrites: OWrites[UserDevice] = jsonWritesConfiguration.writes[UserDevice].flatten
   }
 
   case class UserDevices(devices: Seq[UserDevice]) extends MyPropaneApiResponse
@@ -305,8 +324,9 @@ object MyPropaneApiBehavior {
         tankLevelPercentDiff: Option[Int],
         consumption: Option[Int]
     )
-    @unused private implicit val dataReads: Reads[Data] = jsonConfiguration.reads
+    @unused private implicit val dataReads: Reads[Data] = jsonReadsConfiguration.reads
 
-    private[MyPropaneApiBehavior] implicit val deviceTelemetryReads: Reads[DeviceTelemetry] = jsonConfiguration.reads
+    private[MyPropaneApiBehavior] implicit val deviceTelemetryReads: Reads[DeviceTelemetry] =
+      jsonReadsConfiguration.reads
   }
 }

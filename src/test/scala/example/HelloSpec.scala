@@ -21,6 +21,7 @@ class HelloSpec extends munit.FunSuite {
     cognitoAuthentication.login(email, password).map { result =>
       val _ :: payload :: _ = result.idToken().split('.').toList
       val idTokenPayload = new String(Base64.getDecoder.decode(payload))
+      println(s"idToken: ${result.idToken()}")
       println(s"idTokenPayload: $idTokenPayload")
       assert(idTokenPayload.contains(email))
     }
