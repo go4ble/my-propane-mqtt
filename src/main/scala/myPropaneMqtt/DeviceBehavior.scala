@@ -26,12 +26,7 @@ object DeviceBehavior {
   def apply(myPropaneApi: ActorRef[MyPropaneApiMessage], initialPayload: UserDevice): Behavior[DeviceMessage] =
     Behaviors.setup { context =>
       val discoveryPayload = generateDiscoveryPayload(initialPayload)
-      val mqttMessage = new MqttMessage().tap { m =>
-        m.setPayload(Json.toBytes(Json.toJson(discoveryPayload)))
-        m.setQos(2)
-        m.setRetained(true)
-      }
-      mqttPublish(discoveryTopic(initialPayload), mqttMessage)
+      mqttPublish(discoveryTopic(initialPayload), Json.toBytes(Json.toJson(discoveryPayload)))
       context.self ! UpdateReceived(initialPayload)
       scheduledUpdate(myPropaneApi, initialPayload.device.deviceID)
     }
@@ -44,28 +39,49 @@ object DeviceBehavior {
             UpdateReceived(userDevices.get.devices.find(_.device.deviceID == deviceId).get)
           }
           Behaviors.same
-        case (_, UpdateReceived(device)) =>
-          val mqttMessage = new MqttMessage().tap { m =>
-            m.setPayload(Json.toBytes(Json.toJson(device)))
-            m.setQos(2)
-            m.setRetained(true)
-          }
-          mqttPublish(stateTopic(device), mqttMessage)
-          val nextUpdate = device.nextPostTimeIso.toInstant(ZoneOffset.UTC)
-          // TODO this seems to be running again immediately
-          scheduler.startSingleTimer(
-            msg = DoUpdate,
-            delay = (nextUpdate.toEpochMilli - Instant.now().toEpochMilli + 1.minute.toMillis).millis
+        case (context, UpdateReceived(device)) =>
+          mqttPublish(stateTopic(device), Json.toBytes(Json.toJson(device)))
+          val lastUpdate = device.lastPostTimeIso.toInstant(ZoneOffset.UTC)
+          context.log.info(
+            "{}: last update was {} minutes ago ({})",
+            device.device.deviceName,
+            (Instant.now.getEpochSecond - lastUpdate.getEpochSecond).seconds.toMinutes,
+            lastUpdate
           )
+          val nextUpdate = device.nextPostTimeIso.toInstant(ZoneOffset.UTC)
+          val expectedDelay = (nextUpdate.getEpochSecond - Instant.now().getEpochSecond + 60).seconds
+          context.log.info(
+            "{}: next update is in {} minutes ({})",
+            device.device.deviceName,
+            expectedDelay.toMinutes,
+            nextUpdate
+          )
+
+          val actualDelay = if (expectedDelay < 1.hour) {
+            context.log.warn("{}: expected delay is less than 1 hour; defaulting to 1 hour", device.device.deviceName)
+            1.hour
+          } else {
+            expectedDelay
+          }
+          scheduler.startSingleTimer(msg = DoUpdate, delay = actualDelay)
           Behaviors.same
       }
     }
 
-  private def mqttPublish(topic: String, message: MqttMessage): Unit = {
+  private def mqttPublish(topic: String, payload: Array[Byte]): Unit = {
+    val mqttMessage = new MqttMessage().tap { m =>
+      m.setPayload(payload)
+      m.setQos(2)
+      m.setRetained(true)
+    }
     val mqttClient =
-      new MqttClient(s"tcp://${Config.mqttHost}:${Config.mqttPort}", "my-propane-mqtt-", new MemoryPersistence)
+      new MqttClient(
+        s"tcp://${Config.mqttHost}:${Config.mqttPort}",
+        s"my-propane-mqtt-${UUID.randomUUID()}",
+        new MemoryPersistence
+      )
     mqttClient.connect()
-    mqttClient.publish(topic, message)
+    mqttClient.publish(topic, mqttMessage)
     mqttClient.disconnect()
   }
 
@@ -73,10 +89,6 @@ object DeviceBehavior {
     s"${Config.mqttDeviceDiscoveryTopicPrefix}/device/${device.device.deviceID}/config"
   private def stateTopic(device: UserDevice): String = s"${BuildInfo.name}/${device.device.deviceID}/state"
 
-  // TODO icons
-  // TODO timestamps
-  // TODO recommended precision
-  // TODO device_temp_celsius seems to be publishing the fahrenheit value
   private def generateDiscoveryPayload(device: UserDevice): DiscoveryPayload = {
     def componentFromDeviceField(
         field: String,
@@ -84,15 +96,19 @@ object DeviceBehavior {
         deviceClass: Option[String] = None,
         unitOfMeasurement: Option[String] = None,
         name: Option[String] = None,
-        valueTemplate: Option[String] = None
+        valueTemplate: Option[String] = None,
+        icon: Option[String] = None,
+        suggestedDisplayPrecision: Option[Int] = None
     ) =
       field -> DiscoveryPayload.Component(
-        platform = platform,
+        platform,
         name = name.getOrElse(field.split('_').map(_.capitalize).mkString(" ")),
         valueTemplate = valueTemplate.getOrElse(s"{{ value_json.$field }}"),
         uniqueId = s"${BuildInfo.name}_${device.device.deviceID}_$field",
-        deviceClass = deviceClass,
-        unitOfMeasurement = unitOfMeasurement
+        deviceClass,
+        unitOfMeasurement,
+        icon,
+        suggestedDisplayPrecision
       )
     DiscoveryPayload(
       device = DiscoveryPayload.Device(
@@ -109,7 +125,9 @@ object DeviceBehavior {
           field = "battery_volts",
           platform = "sensor",
           deviceClass = Some("voltage"),
-          unitOfMeasurement = Some("V")
+          unitOfMeasurement = Some("V"),
+          icon = Some("mdi:battery"),
+          suggestedDisplayPrecision = Some(2)
         ),
         componentFromDeviceField(
           field = "device_active",
@@ -125,13 +143,22 @@ object DeviceBehavior {
           field = "device_temp_celsius",
           platform = "sensor",
           deviceClass = Some("temperature"),
-          unitOfMeasurement = Some("°C")
+          unitOfMeasurement = Some("°C"),
+          name = Some("Device Temperature")
         ),
         componentFromDeviceField(
-          field = "device_temp_fahrenheit",
+          field = "last_post_time_iso",
           platform = "sensor",
-          deviceClass = Some("temperature"),
-          unitOfMeasurement = Some("°F")
+          deviceClass = Some("timestamp"),
+          name = Some("Last Post Time"),
+          valueTemplate = Some("{{ value_json.last_post_time_iso }}Z")
+        ),
+        componentFromDeviceField(
+          field = "next_post_time_iso",
+          platform = "sensor",
+          deviceClass = Some("timestamp"),
+          name = Some("Next Post Time"),
+          valueTemplate = Some("{{ value_json.next_post_time_iso }}Z")
         ),
         componentFromDeviceField(
           field = "signal_qual_lte",
@@ -144,12 +171,15 @@ object DeviceBehavior {
           field = "solar_volts",
           platform = "sensor",
           deviceClass = Some("voltage"),
-          unitOfMeasurement = Some("V")
+          unitOfMeasurement = Some("V"),
+          icon = Some("mdi:solar-power"),
+          suggestedDisplayPrecision = Some(2)
         ),
         componentFromDeviceField(
           field = "tank_level",
           platform = "sensor",
-          unitOfMeasurement = Some("%")
+          unitOfMeasurement = Some("%"),
+          icon = Some("mdi:storage-tank")
         )
       ),
       stateTopic = stateTopic(device),
@@ -192,7 +222,9 @@ object DeviceBehavior {
         valueTemplate: String,
         uniqueId: String,
         deviceClass: Option[String] = None,
-        unitOfMeasurement: Option[String] = None
+        unitOfMeasurement: Option[String] = None,
+        icon: Option[String] = None,
+        suggestedDisplayPrecision: Option[Int] = None
     )
     @unused private implicit val componentWrites: OWrites[Component] = jsonConfiguration.writes
 

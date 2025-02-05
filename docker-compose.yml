@@ -8,7 +8,7 @@ services:
 
   hass:
     image: ghcr.io/home-assistant/home-assistant:stable
-    volumes:
-      - ./hass-config/:/config
+    # volumes:
+    #   - ./hass-config/:/config
     ports:
       - "8123:8123"

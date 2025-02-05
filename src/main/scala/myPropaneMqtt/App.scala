@@ -7,7 +7,6 @@ import org.apache.pekko.util.Timeout
 
 import scala.concurrent.duration._
 
-// TODO add logging everywhere
 object App extends scala.App {
   private object AppBehavior {
     def apply(): Behavior[AppMessage] = Behaviors.setup { context =>
@@ -30,10 +29,8 @@ object App extends scala.App {
   private def waitingForDevices(myPropaneApi: ActorRef[MyPropaneApiMessage]): Behavior[AppMessage] =
     Behaviors.receive { case (context, ReceivedDevices(devices)) =>
       devices.foreach { device =>
-        if (device.device.deviceName == "Test") { // TODO temporary
-          val deviceActor = context.spawn(DeviceBehavior(myPropaneApi, device), s"device-${device.device.deviceID}")
-          context.watch(deviceActor)
-        }
+        val deviceActor = context.spawn(DeviceBehavior(myPropaneApi, device), s"device-${device.device.deviceID}")
+        context.watch(deviceActor)
       }
       Behaviors.empty
     }
