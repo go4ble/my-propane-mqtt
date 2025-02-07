@@ -12,3 +12,13 @@ services:
     #   - ./hass-config/:/config
     ports:
       - "8123:8123"
+
+  app:
+    image: ghcr.io/go4ble/my-propane-mqtt:0.1.0-SNAPSHOT
+    environment:
+      MQTT_HOST: mqtt
+      MY_PROPANE_USER_POOL_ID: ""
+      MY_PROPANE_CLIENT_ID: ""
+      MY_PROPANE_CLIENT_SECRET: ""
+      MY_PROPANE_PASSWORD: ""
+      MY_PROPANE_USERNAME: ""

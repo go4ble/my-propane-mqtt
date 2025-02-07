@@ -1,4 +1,5 @@
-import Dependencies._
+import Dependencies.*
+import com.typesafe.sbt.packager.docker.ExecCmd
 
 ThisBuild / scalaVersion := "2.13.15"
 ThisBuild / version := "0.1.0-SNAPSHOT"
@@ -8,6 +9,7 @@ ThisBuild / homepage := Some(url("https://github.com/go4ble/my-propane-mqtt"))
 
 lazy val root = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
+  .enablePlugins(JavaAppPackaging)
   .settings(
     name := "my-propane-mqtt",
     libraryDependencies ++= Seq(
@@ -23,6 +25,11 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       munit % Test
     ),
+    //
     buildInfoKeys := Seq[BuildInfoKey](name, version, homepage),
-    buildInfoPackage := "myPropaneMqtt"
+    buildInfoPackage := "myPropaneMqtt",
+    //
+    dockerBaseImage := "eclipse-temurin:21-jre",
+    dockerRepository := Some("ghcr.io/go4ble"),
+    dockerCommands += ExecCmd("CMD", "-main", "myPropaneMqtt.App")
   )
